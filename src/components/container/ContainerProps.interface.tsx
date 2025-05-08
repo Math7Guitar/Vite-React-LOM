@@ -1,3 +1,3 @@
-export type HeadingProps = {
+export type ContainerProps = {
   children: React.ReactNode;
 }

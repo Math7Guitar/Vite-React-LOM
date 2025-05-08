@@ -20,11 +20,18 @@ body {
   max-width: auto;
 }
 
-.container {
-  max-width: 98rem;
-  margin: 0 auto;
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4rem;
 }
 
-.content {
-  margin: 3.2rem;
+.formRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4rem;
 }

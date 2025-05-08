@@ -1,3 +1,3 @@
-export type HeadingProps = {
+export type LogoProps = {
   children: React.ReactNode;
 }
