@@ -1,29 +1,36 @@
 import styles from './styles.module.css';
+import { useTaskContext } from '../../contexts/task_context/useTaskContext'
+import { getNextCycle } from '../../utils/getNextCycle';
+import { getNextCycleType } from '../../utils/getNextCycleType';
 
 export function Cycles() {
-  const fCycleDotClasses = `${ styles.cycleDot } ${styles.workTime}`
-  const sCycleDotClasses = `${ styles.cycleDot } ${styles.shortBreakTime}`
-  const tCycleDotClasses = `${ styles.cycleDot } ${styles.workTime}`
-  const foCycleDotClasses = `${ styles.cycleDot } ${styles.shortBreakTime}`
-  const fifCycleDotClasses = `${ styles.cycleDot } ${styles.workTime}`
-  const sixCycleDotClasses = `${ styles.cycleDot } ${styles.shortBreakTime}`
-  const sevCycleDotClasses = `${ styles.cycleDot } ${styles.workTime}`
-  const eCycleDotClasses = `${ styles.cycleDot } ${styles.longBreakTime}`
+   const { state } = useTaskContext();
 
+  const cycleStep = Array.from({ length: state.currentCycle });
+
+  const cycleDescriptionMap = {
+    workTime: 'foco',
+    shortBreakTime: 'decanso curso',
+    longBreakTime: 'descanso longo',
+  };
 
   return (
     <div className={ styles.cycles }>
       <span>Cycles:</span>
 
       <div className={ styles.cycleDots }>
-        <span className={ fCycleDotClasses }></span>
-        <span className={ sCycleDotClasses }></span>
-        <span className={ tCycleDotClasses }></span>
-        <span className={ foCycleDotClasses }></span>
-        <span className={ fifCycleDotClasses }></span>
-        <span className={ sixCycleDotClasses }></span>
-        <span className={ sevCycleDotClasses }></span>
-        <span className={ eCycleDotClasses }></span>
+        {cycleStep.map((_, index) => {
+          const nextCycle = getNextCycle(index);
+          const nextCycleType = getNextCycleType(nextCycle);
+          return (
+            <span
+              key={nextCycle}
+              className={`${styles.cycleDot} ${styles[nextCycleType]}`}
+              aria-label={`Indicador de ciclo de ${cycleDescriptionMap[nextCycleType]}`}
+              title={`Indicador de ciclo de ${cycleDescriptionMap[nextCycleType]}`}
+            ></span>
+          );
+        })}
       </div>
     </div>
   );

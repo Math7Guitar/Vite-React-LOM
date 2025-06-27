@@ -1,4 +1,4 @@
-import { TaskStateModel } from './models/TaskStateModel';
+import { TaskStateModel } from '../../models/TaskStateModel.tsx';
 
 export const initialState: TaskStateModel = {
   tasks: [],
