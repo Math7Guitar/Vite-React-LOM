@@ -2,8 +2,14 @@ import { Container } from '../../components/container';
 import { GenericHtml } from '../../components/generic_html';
 import { Heading } from '../../components/heading';
 import { MainTemplate } from '../../templates/main_template';
+import { RouterLink } from '../../components/router_link';
 
 export function AboutPomodoro() {
+
+  useEffect(() => {
+    document.title = 'Entenda a Técnica Pomodoro - Chronos Pomodoro';
+  }, []);
+
   return (
     <MainTemplate>
       <Container>
@@ -50,7 +56,7 @@ export function AboutPomodoro() {
           <p>
             Você pode configurar o tempo de foco, descanso curto e descanso
             longo do jeito que quiser! Basta acessar a{' '}
-            <a href='/settings'>página de configurações</a> e ajustar os minutos
+            <RouterLink href='/settings'>página de configurações</RouterLink> e ajustar os minutos
             como preferir.
           </p>
 

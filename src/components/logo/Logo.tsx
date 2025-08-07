@@ -1,6 +1,7 @@
 import styles from './styles.module.css';
 // import { LogoProps } from './LogoProps.interface.tsx';
 import { TimerIcon } from 'lucide-react';
+import { RouterLink } from '../router_link';
 
 export function Logo() {
   const divClasses = `${styles.logo}`;
@@ -8,10 +9,10 @@ export function Logo() {
 
   return (
     <div className={ divClasses }>
-      <a href="#" className={ aClasses }>
+      <RouterLink href="/home/" className={ aClasses }>
         <TimerIcon />
         <span>Chronos</span>
-      </a>
+      </RouterLink>
     </div>
   );
 }

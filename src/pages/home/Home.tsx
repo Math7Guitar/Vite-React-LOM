@@ -2,10 +2,13 @@ import { MainTemplate } from '../../templates/main_template';
 import { Container } from '../../components/container';
 import { CountDown } from '../../components/count_down';
 import { MainForm } from '../../components/main_form';
-import { HomeProps } from './HomeProps.tsx';
+import { useEffect } from 'react';
 
 export function Home() {
-  const { state, setState } = props;
+
+  useEffect(() => {
+    document.title = 'Chronos Pomodoro';
+  }, []);
 
   return (
     <MainTemplate>

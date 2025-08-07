@@ -1,6 +1,7 @@
 import { TaskStateModel } from '../../models/TaskStateModel.tsx';
+import { TaskActionModel } from './taskActions.tsx';
 
 export type TaskContextProps = {
   state: TaskStateModel;
-  setState: React.Dispatch<React.SetStateAction<TaskStateModel>>;
+  dispatch: React.Dispatch<TaskActionModel>;
 }

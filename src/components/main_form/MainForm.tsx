@@ -2,17 +2,19 @@ import { DefaultInput } from '../default_input';
 import { Cycles } from '../cycles';
 import { DefaultButton } from '../default_button';
 import { PlayCircleIcon, StopCircleIcon } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { getNextCycle } from '../../utils/getNextCycle';
 import { getNextCycleType } from '../../utils/getNextCycleType';
-import { formatSecondsToMinutes } from '../../utils/formatSecondsToMinutes';
+import { TaskActionTypes } from '../../contexts/task_context/taskActions.tsx';
 import { useTaskContext } from '../../contexts/task_context/useTaskContext.tsx';
+import { Tips } from '../tips';
+import { showMessage } from '../../adapters/showMessage';
 
 export function MainForm() {
 
-  const [taskName, setTaskname] = useState('');
-  const { state, setState } = useTaskContext();
+  const { state, dispatch } = useTaskContext();
   const taskNameInput = useRef<HTMLInputElement>(null);
+  const lastTaskName = state.tasks[state.tasks.lenght - 1]?.name || '';
 
   // cycles
   const nextCycle = getNextCycle(state.currentCycle);
@@ -21,12 +23,14 @@ export function MainForm() {
   function handleCreateNewTask() {
     event.preventDefault();
 
+    showMessage.dismiss();
+
     if (taskNameInput.current === null) return;
 
     const taskName = taskNameInput.current.value.trim();
 
     if (!taskName) {
-      alert('Digite o nome da tarefa');
+      showMessage.warn('Digite o nome da tarefa');
       return;
     }
 
@@ -40,47 +44,35 @@ export function MainForm() {
       type: nextCycleType,
     };
 
-    const secondsRemaining = newTask.duration * 60;
+    dispatch({ type: TaskActionTypes.START_TASK, payload: newTask });
 
-    setState(pS => {
-      return {
-        ...pS,
-        config: { ...pS.config },
-        activeTask: newTask,
-        currentCycle: nextCycle, // Conferir
-        secondsRemaining, // Conferir
-        formattedSecondsRemaining: formatSecondsToMinutes(secondsRemaining),
-        tasks: [...pS.tasks, newTask],
-      };
-    });
+    showMessage.success('Tarefa iniciada');
   }
 
   function handleInterruptTask() {
-    setState(prevState => {
-      return {
-        ...prevState,
-        activeTask: null,
-        secondsRemaining: 0,
-        formattedSecondsRemaining: '00:00',
-        tasks: prevState.tasks.map(task => {
-          if (prevState.activeTask && prevState.activeTask.id === task.id) {
-            return { ...task, interruptDate: Date.now() };
-          }
-          return task;
-        }),
-      };
-    });
+    showMessage.dismiss();
+    showMessage.error('Tarefa interrompida!');
+    dispatch({ type: TaskActionTypes.INTERRUPT_TASK });
   }
 
   return (
     <form onSubmit={ e => handleCreateNewTask } className='form' action=''>
 
       <div className='formRow'>
-        <DefaultInput type='text' id='myInput' labelText='Task: ' title='task' required placeholder='Task Name' ref={taskNameInput} disabled={!!state.activeTask} />
+        <DefaultInput
+          type='text'
+          id='myInput'
+          labelText='Task: '
+          title='task'
+          required placeholder='Task Name'
+          ref={taskNameInput}
+          disabled={!!state.activeTask}
+          defaultValue={lastTaskName}
+        />
       </div>
 
       <div className='formRow'>
-        <p>Próximo intervalo é de {state.config.workTime}min</p>
+        <Tips />
       </div>
 
       {state.currentCycle > 0 && (

@@ -1,65 +1,83 @@
 import { initialState } from './InitialState.const.tsx';
 import { TaskContext } from './index.tsx';
 import { TaskContextProviderProps } from './TaskContextProviderProps.interface.tsx';
-import { initialContextValue } from './InitialContextValue.const.tsx';
-import { useState, useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
+import { taskReducer } from './taskReducer.tsx';
+import { TimerWorkerManager } from '../../workers/TimerWorkerManager.tsx';
+import { loadBeep } from '../../utils/loadBeep.ts';
+import { TaskActionTypes } from './taskActions.tsx';
+import { TaskStateModel } from '../../models/TaskStateModel.tsx';
+
 
 export function TaskContextProvider({ children }: TaskContextProviderProps) {
-  const [state, setState] = useState(initialState);
 
-  type ActionType = {More actions
-    type: string;
-    payload?: number;
-  };
+  const [state, dispatch] = useReducer(taskReducer, initialState, () => {
+    const storageState = localStorage.getItem('state');
 
-  const [myState, dispatch] = useReducer(
-    (state, action: ActionType) => {
-      console.log(state, action);
-      switch (action.type) {
-        case 'INCREMENT': {
-          if (!action.payload) return state;
+    if(storageState === null) return initialState;
 
-          return {
-            ...state,
-            secondsRemaing: state.secondsRemaing + action.payload,
-          };
-        }
-        case 'DECREMENT': {
-          if (!action.payload) return state;
+    const parsedStorageState = JSON.parse(storageState) as TaskStateModel;
 
-          return {
-            ...state,
-            secondsRemaing: state.secondsRemaing - action.payload,
-          };
-        }
-        case 'RESET': {
-          return {
-            secondsRemaing: 0,
-          };
-        }
+    return {
+      ...parsedStorageState,
+      activeTask: null,
+      secondsRemaining: 0,
+      formattedSecondsRemaining: '00:00',
+    };
+  });
+
+  const playBeepRef = useRef<ReturnType<typeof loadBeep> | null>(null);
+
+  const worker = TimerWorkerManager.getInstance();
+
+  worker.onmessage(e => {
+
+    const countDownSeconds = e.data;
+
+    if(countDownSeconds <= 0) {
+
+      if(playBeepRef.current) {
+        playBeepRef.current();
+        playBeepRef.current = null;
       }
 
-      return state; // estado atual (não altera)
-    },
-    {
-      secondsRemaing: 0,
-    },
-  );
-  // useEffect(() => {
-  //   console.log(state);
-  // }, [state]);
+      dispatch({ type: TaskActionTypes.COMPLETE_TASK, });
+
+      worker.terminate();
+
+    } else {
+
+      dispatch({
+        type: TaskActionTypes.COUNT_DOWN,
+        payload: { secondsRemaining: countDownSeconds },
+      });
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('state', JSON.stringify(state));
+
+    if(!state.activeTask) {
+      worker.terminate();
+    }
+
+    document.title = `${ state.formattedSecondsRemaining } - Chronos Pomodoro`;
+
+    worker.postMessage(state);
+  }, [worker, state]);
+
+  useEffect(() => {
+    if(state.activeTask && playBeepRef.current === null) {
+      playBeepRef.current = loadBeep();
+    } else {
+      playBeepRef.current = null;
+    }
+
+  }, [state.activeTask]);
 
   return (
-    <TaskContext.Provider value={{ state, setState }}><h1>O estado é: {JSON.stringify(myState)}</h1>More actions
-      <button onClick={() => dispatch({ type: 'INCREMENT', payload: 10 })}>
-        Incrementar +10
-      </button>
-      <button onClick={() => dispatch({ type: 'INCREMENT', payload: 20 })}>
-        Incrementar +20
-      </button>
-      <button onClick={() => dispatch({ type: 'DECREMENT', payload: 50 })}>
-        Decrementar -50
-      </button>
-      <button onClick={() => dispatch({ type: 'RESET' })}>RESET</button></TaskContext.Provider>
+    <TaskContext.Provider value={{ state, dispatch }}>
+      { children }
+    </TaskContext.Provider>
   );
 }

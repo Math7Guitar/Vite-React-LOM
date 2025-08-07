@@ -1,11 +1,16 @@
 import './styles/theme.css';
 import './styles/global.css';
 
-import { Home } from './pages/home';
-// import { NotFound } from './pages/not_found';
-// import { AboutPomodoro } from './pages/about_pomodoro';
-import { TextContextProvider } from './contexts/task_context';
+import { MainRouter } from './routers/main_router';
+import { MessagesContainer } from './components/messages_container';
+import { TaskContextProvider } from './contexts/task_context/TaskContextProvider.tsx';
 
 export function App() {
-  return (<TaskContextProvider><Home /></TaskContextProvider>);
+  return (
+    <TaskContextProvider>
+      <MessagesContainer>
+        <MainRouter />
+      </MessagesContainer>
+    </TaskContextProvider>
+  );
 }
