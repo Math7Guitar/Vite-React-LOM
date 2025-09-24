@@ -5,9 +5,7 @@ export function Container(props: ContainerProps) {
   return (
     <div className={ styles.container }>
       <div className={ styles.content }>
-        <section>
-          { props.children }
-        </section>
+        { props.children }
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ export function Logo() {
 
   return (
     <div className={ divClasses }>
-      <RouterLink href="/home/" className={ aClasses }>
+      <RouterLink href="/home" className={ aClasses }>
         <TimerIcon />
         <span>Chronos</span>
       </RouterLink>

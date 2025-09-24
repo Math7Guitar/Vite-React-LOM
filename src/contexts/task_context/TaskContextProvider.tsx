@@ -3,7 +3,7 @@ import { TaskContext } from './index.tsx';
 import { TaskContextProviderProps } from './TaskContextProviderProps.interface.tsx';
 import { useEffect, useReducer, useRef } from 'react';
 import { taskReducer } from './taskReducer.tsx';
-import { TimerWorkerManager } from '../../workers/TimerWorkerManager.tsx';
+import { TimerWorkerManager } from '../../workers/TimerWorkerManager.ts';
 import { loadBeep } from '../../utils/loadBeep.ts';
 import { TaskActionTypes } from './taskActions.tsx';
 import { TaskStateModel } from '../../models/TaskStateModel.tsx';
